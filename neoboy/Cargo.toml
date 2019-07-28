@@ -1,0 +1,8 @@
+[package]
+name = "neoboy"
+version = "0.1.0"
+authors = ["Eric Scrivner <eric.t.scrivner@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+gameboy = { path = "../gameboy" }
