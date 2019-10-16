@@ -1,6 +1,10 @@
 pub mod cartridge;
 pub mod cpu;
+pub mod machine;
 pub mod memory;
+pub mod operations;
+pub mod registers;
+pub mod rom;
 
 use std::fs::File;
 use std::io::Read;
@@ -8,18 +12,16 @@ use std::io;
 
 /// Represents a 16-bit memory address
 pub type Address = u16;
-/// Represents an 8-bit register value
-pub type Reg8 = u8;
-/// Represents a 16-bit register value
-pub type Reg16 = u16;
 /// Represents a 3-bit unsigned integer constant
-pub type Const3 = u8;
-/// Represents an 8-bit constant value
-pub type Const8 = u8;
-/// Represents a 16-bit constant value
-pub type Const16 = u16;
-/// Represents an 8-bit offset value
-pub type Offset = u8;
+pub type Imm3 = u8;
+/// Represents an 8-bit immediate value
+pub type Imm8 = u8;
+/// Represents a 16-bit immediate value
+pub type Imm16 = u16;
+/// Represents an 8-bit signed offset value
+pub type Offset8 = i8;
+/// Represents a cycle count
+pub type Cycles = u16;
 
 /// Generic result type for emulator errors
 pub type GameboyResult<T> = std::result::Result<T, GameboyError>;
@@ -45,6 +47,10 @@ pub enum GameboyErrorKind {
     CartridgeTooSmall(usize),
     /// Attempt to load too much data into memory. Contains load start address and data size.
     MemoryLoadOutOfBounds(Address, usize),
+    /// Opcode prefix was not recognized.
+    UnknownOpcodePrefix(u8),
+    /// Unknown ALU opcode prefix
+    UnknownAluOpcodePrefix(u8),
     /// Unknown error with a description
     Unknown(String)
 }
@@ -70,4 +76,9 @@ pub fn read_rom_file(rom_path: &str) -> io::Result<Vec<u8>> {
     file.read_to_end(&mut buffer)?;
 
     Ok(buffer)
+}
+
+/// Combines two 8-bit values into a single 16-bit value.
+pub fn make_u16(msb: u8, lsb: u8) -> u16 {
+    (msb as u16) << 8 | lsb as u16
 }
